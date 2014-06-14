@@ -11,6 +11,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,48 +44,60 @@ public class MainActivity extends Activity {
         }
     }
 
-    private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
+    private class DownloadWebpageTask extends AsyncTask<Void, Void, String> {
         @Override
-        protected String doInBackground(String... urls) {
-            InputStream is = null;
-            int len = 1000;
+        protected String doInBackground(Void... params) {
             try {
-                URL url = new URL("http://weekend-v4.meteor.com/server/posts");
+                return downloadUrl();
+            } catch (IOException e) {
+                return "Unable to retrieve web page. URL may be invalid.";
+            } catch (JSONException e) {
+                return "Unable to convert JSON.";
+            }
+        }
+
+        private String downloadUrl() throws IOException, JSONException {
+            InputStream is = null;
+            try {
+                int len = 1000;
+                URL url = new URL("http://maxclique-monday-v1.meteor.com/server/posts?no_pic=true");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000 /* milliseconds */);
-                conn.setConnectTimeout(15000 /* milliseconds */);
+                conn.setReadTimeout(10000);
+                conn.setConnectTimeout(15000);
                 conn.setRequestMethod("GET");
                 conn.setDoInput(true);
                 // Starts the query
                 conn.connect();
                 int response = conn.getResponseCode();
                 Log.d("Tuesday", "The response is: " + response);
+                // TODO(austin) handle cases when content length == -1
+                int responseLength = conn.getContentLength();
                 is = conn.getInputStream();
 
                 // Convert the InputStream into a string
-                Reader reader = null;
-                reader = new InputStreamReader(is, "UTF-8");
-                char[] buffer = new char[len];
+                Reader reader = new InputStreamReader(is, "UTF-8");
+                char[] buffer = new char[responseLength];
                 reader.read(buffer);
+
                 return new String(buffer);
 
                 // Makes sure that the InputStream is closed after the app is
                 // finished using it.
-            } catch (IOException e) {
-                return "Unable to retrieve web page. URL may be invalid.";
             } finally {
                 if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                    }
+                    is.close();
                 }
             }
         }
 
         @Override
         protected void onPostExecute(String result) {
-            textView.setText(result);
+            try {
+                textView.setText(new JSONParser<JSONArray>(result,
+                        new JSONParser.JSONArrayFactory()).getJSON().toString());
+            } catch (Exception e) {
+                textView.setText("Failure!");
+            }
         }
     }
 

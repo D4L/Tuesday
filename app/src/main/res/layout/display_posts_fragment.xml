@@ -10,7 +10,7 @@
         android:id="@+id/posts_list_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:divider="#c2c2c2"
+        android:divider="#3c3c3c"
         android:dividerHeight="1dp"
         android:listSelector="@drawable/post_row_selector"/>
 

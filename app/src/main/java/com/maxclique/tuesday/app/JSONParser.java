@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Austin on 6/13/2014.
@@ -26,6 +28,21 @@ public class JSONParser<JSONType> {
 
     public JSONParser(String string, JSONFactory<JSONType> factory) throws JSONException {
         jsonObject = factory.create(string);
+    }
+
+    public static JSONObject[] convertJSONObjects(String key, String value) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(key, value);
+        JSONObject[] result = new JSONObject[]{new JSONObject(map)};
+        return result;
+    }
+
+    public static JSONObject[] convertJSONObjects(JSONArray array) throws JSONException {
+        JSONObject[] result = new JSONObject[array.length()];
+        for (int i = 0; i < array.length(); ++i) {
+            result[i] = array.getJSONObject(i);
+        }
+        return result;
     }
 
     public JSONType getJSON() {

@@ -1,5 +1,6 @@
 package com.maxclique.tuesday.app;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -10,10 +11,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +31,7 @@ import java.net.URL;
  */
 public class DisplayPostsFragment extends Fragment {
 
-    private TextView textView;
+    private ListView listView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,7 +39,7 @@ public class DisplayPostsFragment extends Fragment {
         // Inflate the layout for this fragment
         View resultantView = inflater.inflate(R.layout.display_posts_fragment, container, false);
 
-        textView = (TextView) resultantView.findViewById(R.id.my_text_view);
+        listView = (ListView) resultantView.findViewById(R.id.posts_list_view);
         refresh();
 
         return resultantView;
@@ -45,12 +49,58 @@ public class DisplayPostsFragment extends Fragment {
         ConnectivityManager connMgr = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        textView.setText(R.string.fetching);
+        writeListView(getString(R.string.fetching));
         if (networkInfo != null && networkInfo.isConnected()) {
             new DownloadWebpageTask().execute();
         } else {
             // display
-            textView.setText(R.string.no_network);
+            writeListView(getString(R.string.no_network));
+        }
+    }
+
+    protected void writeListView(String string) {
+        writeListView(JSONParser.convertJSONObjects(getString(R.string.subject), string));
+    }
+
+    protected void writeListView(JSONObject[] objects) {
+        PostListAdapter postAdapter = new PostListAdapter(getActivity(),
+                R.layout.display_post_row, objects);
+        listView.setAdapter(postAdapter);
+    }
+
+    private class PostListAdapter extends ArrayAdapter<JSONObject> {
+        Context context;
+        int layoutResourceId;
+        JSONObject[] objects;
+
+        public PostListAdapter(Context context, int resource, JSONObject[] objects) {
+            super(context, resource, objects);
+            this.context = context;
+            this.layoutResourceId = resource;
+            this.objects = objects;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View row = convertView;
+            if (row == null) {
+                row = ((Activity)context).getLayoutInflater().inflate(
+                        layoutResourceId, parent, false);
+
+            }
+            JSONObject post = objects[position];
+            TextView titleView = (TextView) row.findViewById(R.id.title);
+            TextView dateView = (TextView) row.findViewById(R.id.date);
+            try {
+                titleView.setText(post.getString(getString(R.string.subject)));
+
+            } catch (JSONException e) {
+                titleView.setText(getString(R.string.json_convert_error));
+            }
+            try {
+                dateView.setText(post.getString(getString(R.string.created_at)));
+            } catch (JSONException e) {}
+            return row;
         }
     }
 
@@ -103,10 +153,10 @@ public class DisplayPostsFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             try {
-                textView.setText(new JSONParser<JSONArray>(result,
-                        new JSONParser.JSONArrayFactory()).getJSON().toString());
+                writeListView(JSONParser.convertJSONObjects(new JSONParser<JSONArray>(result,
+                        new JSONParser.JSONArrayFactory()).getJSON()));
             } catch (Exception e) {
-                textView.setText("Failure!");
+                writeListView("Failure!");
             }
         }
     }

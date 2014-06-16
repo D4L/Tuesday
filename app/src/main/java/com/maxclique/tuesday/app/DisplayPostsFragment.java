@@ -45,12 +45,12 @@ public class DisplayPostsFragment extends Fragment {
         ConnectivityManager connMgr = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        textView.setText(R.string.fetching);
         if (networkInfo != null && networkInfo.isConnected()) {
-            textView.setText("Has network!");
             new DownloadWebpageTask().execute();
         } else {
             // display
-            textView.setText("No network!");
+            textView.setText(R.string.no_network);
         }
     }
 
@@ -60,9 +60,9 @@ public class DisplayPostsFragment extends Fragment {
             try {
                 return downloadUrl();
             } catch (IOException e) {
-                return "Unable to retrieve web page. URL may be invalid.";
+                return getString(R.string.url_error);
             } catch (JSONException e) {
-                return "Unable to convert JSON.";
+                return getString(R.string.json_convert_error);
             }
         }
 

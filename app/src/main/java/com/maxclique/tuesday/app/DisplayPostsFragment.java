@@ -22,7 +22,6 @@ import org.json.JSONObject;
  */
 public class DisplayPostsFragment extends Fragment {
 
-    private final String ALL_POSTS = "http://maxclique-monday-v1.meteor.com/server/posts?no_pic=true";
     private ListView listView;
 
     @Override
@@ -43,7 +42,7 @@ public class DisplayPostsFragment extends Fragment {
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         writeListView(getString(R.string.fetching));
         if (networkInfo != null && networkInfo.isConnected()) {
-            new DownloadWebpageTask(ALL_POSTS,
+            new DownloadWebpageTask(ServerURL.getAllPosts(),
                     new DownloadWebpageTask.DownloadWebpageTaskCallback() {
                         @Override
                         public void run(String resultOfTask) {

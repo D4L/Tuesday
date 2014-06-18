@@ -10,5 +10,8 @@ public class ServerURL {
     public static String getAllPosts() {
         return BASE_URL + "posts" + NO_PIC;
     }
-    public static String getPost(String id) {return BASE_URL + "posts/" + id + NO_PIC;}
+
+    public static String getPost(String id) {
+        return BASE_URL + "posts/" + id + NO_PIC;
+    }
 }

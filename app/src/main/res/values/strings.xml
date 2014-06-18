@@ -14,4 +14,13 @@
     <string name="url_error">Unable to retrieve web page. URL may be invalid.</string>
     <string name="json_convert_error">Error converting to JSON</string>
 
+    <string name="second_ago">seconds ago</string>
+    <string name="seconds_ago">&#160;seconds ago</string>
+    <string name="minute_ago">a minute ago</string>
+    <string name="minutes_ago">&#160; minutes ago</string>
+    <string name="hour_ago">an hour ago</string>
+    <string name="hours_ago">&#160;hours ago</string>
+    <string name="yesterday">yesterday</string>
+    <string name="too_long_ago">too long ago</string>
+
 </resources>

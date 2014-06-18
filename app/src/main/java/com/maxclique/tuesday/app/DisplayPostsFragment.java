@@ -130,7 +130,8 @@ public class DisplayPostsFragment extends Fragment {
                 titleView.setText(getString(R.string.json_convert_error));
             }
             try {
-                dateView.setText(post.getString(getString(R.string.created_at)));
+                dateView.setText(TimeAgoParser.timeAgoSince(getContext(),
+                        post.getLong(getString(R.string.created_at))));
             } catch (JSONException e) {
             }
             return row;

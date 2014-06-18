@@ -54,7 +54,8 @@ public class DisplayPostFragment extends Fragment {
                                 JSONObject object = new JSONParser<JSONObject>(resultOfTask,
                                         new JSONParser.JSONObjectFactory()).getJSON();
                                 titleView.setText(object.getString(getString(R.string.subject)));
-                                dateView.setText(object.getString(getString(R.string.created_at)));
+                                dateView.setText(TimeAgoParser.timeAgoSince(getActivity(),
+                                    object.getLong(getString(R.string.created_at))));
                                 detailsView.setText(object.optString(getString(R.string.details),
                                         ""));
                             } catch (Exception e) {

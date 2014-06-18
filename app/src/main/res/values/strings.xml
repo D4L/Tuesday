@@ -8,6 +8,7 @@
     <string name="fetching">Fetching</string>
     <string name="subject">subject</string>
     <string name="created_at">created_at</string>
+    <string name="details">details</string>
 
     <string name="no_network">There is no network!</string>
     <string name="url_error">Unable to retrieve web page. URL may be invalid.</string>

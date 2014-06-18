@@ -71,6 +71,11 @@ public class DownloadWebpageTask extends AsyncTask<Void, Void, String> {
         }
     }
 
+    @Override
+    protected void onPostExecute(String result) {
+        this.callback.run(result);
+    }
+
     public interface DownloadWebpageTaskCallback {
         public void run(String resultOfTask);
     }

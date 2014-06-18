@@ -2,13 +2,17 @@ package com.maxclique.tuesday.app;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,6 +35,17 @@ public class DisplayPostsFragment extends Fragment {
         View resultantView = inflater.inflate(R.layout.display_posts_fragment, container, false);
 
         listView = (ListView) resultantView.findViewById(R.id.posts_list_view);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
+                PostListAdapter postListAdapter = (PostListAdapter)arg0.getAdapter();
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                DisplayPostFragment fragment = new DisplayPostFragment();
+                fragmentTransaction.replace(R.id.main_content, fragment).commit();
+                Log.d("Tuesday", postListAdapter.getObject(position).toString());
+            }
+        });
         refresh();
 
         return resultantView;
@@ -85,6 +100,10 @@ public class DisplayPostsFragment extends Fragment {
             this.objects = objects;
         }
 
+        public JSONObject getObject(int index) {
+            return objects[index];
+        }
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View row = convertView;
@@ -93,12 +112,11 @@ public class DisplayPostsFragment extends Fragment {
                         layoutResourceId, parent, false);
 
             }
-            JSONObject post = objects[position];
+            JSONObject post = getObject(position);
             TextView titleView = (TextView) row.findViewById(R.id.title);
             TextView dateView = (TextView) row.findViewById(R.id.date);
             try {
                 titleView.setText(post.getString(getString(R.string.subject)));
-
             } catch (JSONException e) {
                 titleView.setText(getString(R.string.json_convert_error));
             }

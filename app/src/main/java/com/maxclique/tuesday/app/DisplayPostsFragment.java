@@ -39,11 +39,20 @@ public class DisplayPostsFragment extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-                PostListAdapter postListAdapter = (PostListAdapter)arg0.getAdapter();
+                PostListAdapter postListAdapter = (PostListAdapter) arg0.getAdapter();
+                JSONObject currentObject = postListAdapter.getObject(position);
+
+                // switch the fragment
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 DisplayPostFragment fragment = new DisplayPostFragment();
-                fragmentTransaction.replace(R.id.main_content, fragment).commit();
-                Log.d("Tuesday", postListAdapter.getObject(position).toString());
+                Bundle args = new Bundle();
+                try {
+                    args.putString("id", currentObject.getString("_id"));
+                } catch (JSONException e) {
+                }
+                fragment.setArguments(args);
+                fragmentTransaction.replace(R.id.main_content, fragment)
+                        .addToBackStack(null).commit();
             }
         });
         refresh();

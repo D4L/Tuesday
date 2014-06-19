@@ -167,6 +167,12 @@ public class DisplayPostsFragment extends Fragment {
                         .findFragmentById(R.id.main_content);
                 fragment.refresh();
                 return true;
+            case R.id.action_add:
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                AddPostFragment postFragment = new AddPostFragment();
+                fragmentTransaction.replace(R.id.main_content, postFragment)
+                        .addToBackStack(null).commit();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

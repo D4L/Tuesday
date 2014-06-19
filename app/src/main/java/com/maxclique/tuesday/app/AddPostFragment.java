@@ -15,6 +15,9 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.HashMap;
 
 /**
  * Created by Austin on 6/19/2014.
@@ -49,6 +52,10 @@ public class AddPostFragment extends Fragment {
     }
 
     private void addPost(String subject, String details) {
+        HashMap<String, String> object = new HashMap<String, String>();
+        object.put(getString(R.string.subject), subject);
+        object.put(getString(R.string.details), details);
+
         ConnectivityManager connMgr = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -59,11 +66,11 @@ public class AddPostFragment extends Fragment {
 
                         @Override
                         public void run(String resultOfTask) {
-
+                            getFragmentManager().popBackStack();
                         }
 
                     }
-            ).execute();
+            ).execute(object);
         } else {
             // display
             //writeListView(getString(R.string.no_network));

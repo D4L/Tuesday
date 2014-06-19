@@ -66,6 +66,7 @@ public class DisplayPostsFragment extends Fragment {
         ActionBar actionBar = getActivity().getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setHomeButtonEnabled(false);
+        actionBar.setTitle(getString(R.string.app_name));
         setHasOptionsMenu(true);
 
         return resultantView;

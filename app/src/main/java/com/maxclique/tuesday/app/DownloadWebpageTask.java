@@ -32,17 +32,16 @@ public class DownloadWebpageTask extends AsyncTask<Void, Void, String> {
             return downloadUrl();
         } catch (IOException e) {
             return Resources.getSystem().getString(R.string.url_error);
-        } catch (JSONException e) {
-            return Resources.getSystem().getString(R.string.json_convert_error);
         }
     }
 
-    private String downloadUrl() throws IOException, JSONException {
+    private String downloadUrl() throws IOException {
         InputStream is = null;
+        HttpURLConnection conn = null;
         try {
             int len = 1000;
             URL url = new URL(this.url);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10000);
             conn.setConnectTimeout(15000);
             conn.setRequestMethod("GET");
@@ -65,6 +64,9 @@ public class DownloadWebpageTask extends AsyncTask<Void, Void, String> {
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
         } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
             if (is != null) {
                 is.close();
             }

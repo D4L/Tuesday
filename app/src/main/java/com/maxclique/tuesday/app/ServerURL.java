@@ -14,4 +14,8 @@ public class ServerURL {
     public static String getPost(String id) {
         return BASE_URL + "posts/" + id + NO_PIC;
     }
+
+    public static String addPost() {
+        return BASE_URL + "posts";
+    }
 }

@@ -2,14 +2,8 @@ package com.maxclique.tuesday.app;
 
 import android.app.ActionBar;
 import android.app.Fragment;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,10 +34,30 @@ public class DisplayPostFragment extends Fragment {
         actionBar.setDisplayHomeAsUpEnabled(true);
         setHasOptionsMenu(true);
 
-        refresh();
+        JSONObject object = grabObjectFromArgs();
+        if (object != null) {
+            writeViews(object);
+        }
         return resultantView;
     }
 
+    private JSONObject grabObjectFromArgs() {
+        String stringObject = getArguments().getString("object", null);
+        if (stringObject == null) {
+            return null;
+        }
+        JSONObject object;
+        try {
+            object = new JSONParser<JSONObject>(stringObject,
+                    new JSONParser.JSONObjectFactory()).getJSON();
+        } catch (Exception e) {
+            titleView.setText("Failure!");
+            return null;
+        }
+        return object;
+    }
+
+    /* TODO(austin): get image here instead
     public void refresh() {
         ConnectivityManager connMgr = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -58,24 +72,25 @@ public class DisplayPostFragment extends Fragment {
                     new DownloadWebpageTask.DownloadWebpageTaskCallback() {
                         @Override
                         public void run(String resultOfTask) {
-                            Log.d("Tuesday", resultOfTask);
-                            try {
-                                JSONObject object = new JSONParser<JSONObject>(resultOfTask,
-                                        new JSONParser.JSONObjectFactory()).getJSON();
-                                titleView.setText(object.getString(getString(R.string.subject)));
-                                dateView.setText(TimeAgoParser.timeAgoSince(getActivity(),
-                                    object.getLong(getString(R.string.created_at))));
-                                detailsView.setText(object.optString(getString(R.string.details),
-                                        ""));
-                            } catch (Exception e) {
-                                titleView.setText("Failure!");
-                            }
                         }
                     }
             ).execute();
         } else {
             // display
             titleView.setText(getString(R.string.no_network));
+        }
+    }
+    */
+
+    private void writeViews(JSONObject object) {
+        try {
+            titleView.setText(object.getString(getString(R.string.subject)));
+            dateView.setText(TimeAgoParser.timeAgoSince(getActivity(),
+                    object.getLong(getString(R.string.created_at))));
+            detailsView.setText(object.optString(getString(R.string.details),
+                    ""));
+        } catch (Exception e) {
+            titleView.setText("Failure!");
         }
     }
 

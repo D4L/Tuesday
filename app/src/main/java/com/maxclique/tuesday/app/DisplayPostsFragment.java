@@ -28,7 +28,8 @@ import org.json.JSONObject;
  */
 public class DisplayPostsFragment extends Fragment {
 
-    private ListView listView;
+    private ListView mListView;
+    private JSONObject[] mObjects = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,8 +37,8 @@ public class DisplayPostsFragment extends Fragment {
         // Inflate the layout for this fragment
         View resultantView = inflater.inflate(R.layout.display_posts_fragment, container, false);
 
-        listView = (ListView) resultantView.findViewById(R.id.posts_list_view);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView = (ListView) resultantView.findViewById(R.id.posts_list_view);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
@@ -48,16 +49,18 @@ public class DisplayPostsFragment extends Fragment {
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 DisplayPostFragment fragment = new DisplayPostFragment();
                 Bundle args = new Bundle();
-                try {
-                    args.putString("id", currentObject.getString("_id"));
-                } catch (JSONException e) {
-                }
+                args.putString("object", currentObject.toString());
                 fragment.setArguments(args);
                 fragmentTransaction.replace(R.id.main_content, fragment)
                         .addToBackStack(null).commit();
             }
         });
-        refresh();
+
+        if (mObjects == null) {
+            refresh();
+        } else {
+            writeListView(mObjects);
+        }
 
         // set up the app icon as an UP button
         ActionBar actionBar = getActivity().getActionBar();
@@ -79,10 +82,10 @@ public class DisplayPostsFragment extends Fragment {
                         @Override
                         public void run(String resultOfTask) {
                             try {
-                                writeListView(JSONParser.convertJSONObjects(
+                                mObjects =  JSONParser.convertJSONObjects(
                                         new JSONParser<JSONArray>(resultOfTask,
-                                                new JSONParser.JSONArrayFactory()).getJSON()
-                                ));
+                                                new JSONParser.JSONArrayFactory()).getJSON());
+                                writeListView(mObjects);
                             } catch (Exception e) {
                                 writeListView("Failure!");
                             }
@@ -102,7 +105,7 @@ public class DisplayPostsFragment extends Fragment {
     protected void writeListView(JSONObject[] objects) {
         PostListAdapter postAdapter = new PostListAdapter(getActivity(),
                 R.layout.display_post_row, objects);
-        listView.setAdapter(postAdapter);
+        mListView.setAdapter(postAdapter);
     }
 
     private class PostListAdapter extends ArrayAdapter<JSONObject> {

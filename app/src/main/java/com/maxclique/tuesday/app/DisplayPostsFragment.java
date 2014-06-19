@@ -1,15 +1,17 @@
 package com.maxclique.tuesday.app;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -56,6 +58,12 @@ public class DisplayPostsFragment extends Fragment {
             }
         });
         refresh();
+
+        // set up the app icon as an UP button
+        ActionBar actionBar = getActivity().getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setHomeButtonEnabled(false);
+        setHasOptionsMenu(true);
 
         return resultantView;
     }
@@ -138,4 +146,26 @@ public class DisplayPostsFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu items for use in the action bar
+        inflater.inflate(R.menu.main_activity_actions, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_refresh:
+                DisplayPostsFragment fragment = (DisplayPostsFragment) getFragmentManager()
+                        .findFragmentById(R.id.main_content);
+                fragment.refresh();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }

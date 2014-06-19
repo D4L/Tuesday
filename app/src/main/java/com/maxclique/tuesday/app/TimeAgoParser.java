@@ -25,7 +25,7 @@ public class TimeAgoParser {
         } else if (milliDifference < 2*MIN) {
             return c.getString(R.string.minute_ago);
         } else if (milliDifference < HOUR) {
-            return (int)(milliDifference / MIN) + c.getString(R.string.minute_ago);
+            return (int)(milliDifference / MIN) + c.getString(R.string.minutes_ago);
         } else if (milliDifference < 2*HOUR) {
             return c.getString(R.string.hour_ago);
         } else if (milliDifference < DAY) {

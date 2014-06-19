@@ -23,6 +23,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 /**
  * Created by Austin on 6/15/2014.
  */
@@ -86,6 +89,20 @@ public class DisplayPostsFragment extends Fragment {
                                 mObjects =  JSONParser.convertJSONObjects(
                                         new JSONParser<JSONArray>(resultOfTask,
                                                 new JSONParser.JSONArrayFactory()).getJSON());
+                                Arrays.sort(mObjects, new Comparator<JSONObject>() {
+                                    @Override
+                                    public int compare(JSONObject lhs, JSONObject rhs) {
+                                        String field = getString(R.string.created_at);
+                                        long left, right;
+                                        try {
+                                            left = lhs.getLong(field);
+                                            right = rhs.getLong(field);
+                                        } catch (JSONException e) {
+                                            return 0;
+                                        }
+                                        return left < right ? 1 : -1;
+                                    }
+                                });
                                 writeListView(mObjects);
                             } catch (Exception e) {
                                 writeListView("Failure!");

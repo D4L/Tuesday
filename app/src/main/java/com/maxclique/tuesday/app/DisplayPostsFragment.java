@@ -86,9 +86,10 @@ public class DisplayPostsFragment extends Fragment {
                         @Override
                         public void run(String resultOfTask) {
                             try {
-                                mObjects =  JSONParser.convertJSONObjects(
+                                mObjects = JSONParser.convertJSONObjects(
                                         new JSONParser<JSONArray>(resultOfTask,
-                                                new JSONParser.JSONArrayFactory()).getJSON());
+                                                new JSONParser.JSONArrayFactory()).getJSON()
+                                );
                                 Arrays.sort(mObjects, new Comparator<JSONObject>() {
                                     @Override
                                     public int compare(JSONObject lhs, JSONObject rhs) {

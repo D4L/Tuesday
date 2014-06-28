@@ -4,8 +4,6 @@ import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.apache.http.client.utils.URIUtils;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +18,6 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by Austin on 6/19/2014.
@@ -85,6 +81,9 @@ public class PostWebpageTask extends AsyncTask<HashMap<String, String>, Void, St
             // start the post
             conn.connect();
             Log.d("Tuesday", "The response is " + conn.getResponseCode());
+            if (conn.getResponseCode() != 200) {
+                return "";
+            }
 
             int responseLength = conn.getContentLength();
             is = conn.getInputStream();

@@ -2,11 +2,18 @@ package com.maxclique.tuesday.app;
 
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONObject;
@@ -19,6 +26,7 @@ public class DisplayPostFragment extends Fragment {
     private TextView titleView;
     private TextView detailsView;
     private TextView dateView;
+    private ImageView mImageView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -28,6 +36,7 @@ public class DisplayPostFragment extends Fragment {
         titleView = (TextView) resultantView.findViewById(R.id.title);
         detailsView = (TextView) resultantView.findViewById(R.id.details);
         dateView = (TextView) resultantView.findViewById(R.id.date);
+        mImageView = (ImageView) resultantView.findViewById(R.id.image);
 
         // set up the app icon as an UP button
         ActionBar actionBar = getActivity().getActionBar();
@@ -37,6 +46,11 @@ public class DisplayPostFragment extends Fragment {
         JSONObject object = grabObjectFromArgs();
         if (object != null) {
             writeViews(object);
+        }
+
+        try {
+            grabImage(object.getString("_id"));
+        } catch (Exception e) {
         }
         return resultantView;
     }
@@ -57,30 +71,31 @@ public class DisplayPostFragment extends Fragment {
         return object;
     }
 
-    /* TODO(austin): get image here instead
-    public void refresh() {
+    public void grabImage(String id) {
         ConnectivityManager connMgr = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        titleView.setText(getString(R.string.fetching));
         if (networkInfo != null && networkInfo.isConnected()) {
-            String postId = getArguments().getString("id", null);
-            if (postId == null) {
-                return;
-            }
-            new DownloadWebpageTask(ServerURL.getPost(postId),
+            new DownloadWebpageTask(ServerURL.getImage(id),
                     new DownloadWebpageTask.DownloadWebpageTaskCallback() {
                         @Override
                         public void run(String resultOfTask) {
+
+                            if (resultOfTask.equals("")) {
+                                return;
+                            }
+                            String imageDataBytes =
+                                    resultOfTask.substring(resultOfTask.indexOf(",") + 1);
+
+                            byte[] is = Base64.decode(imageDataBytes, Base64.NO_PADDING);
+                            Bitmap imageBitmap = BitmapFactory.decodeByteArray(
+                                    is, 0, is.length);
+                            mImageView.setImageBitmap(imageBitmap);
                         }
                     }
             ).execute();
-        } else {
-            // display
-            titleView.setText(getString(R.string.no_network));
         }
     }
-    */
 
     private void writeViews(JSONObject object) {
         try {

@@ -18,4 +18,8 @@ public class ServerURL {
     public static String addPost() {
         return BASE_URL + "posts";
     }
+
+    public static String getImage(String id) {
+        return BASE_URL + "posts/" + id + "/image";
+    }
 }

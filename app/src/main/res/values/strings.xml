@@ -20,6 +20,7 @@
     <string name="no_network">There is no network!</string>
     <string name="url_error">Unable to retrieve web page. URL may be invalid.</string>
     <string name="json_convert_error">Error converting to JSON</string>
+    <string name="unfound_resource">Unfound Resource.</string>
 
     <string name="second_ago">seconds ago</string>
     <string name="seconds_ago">&#160;seconds ago</string>

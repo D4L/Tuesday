@@ -1,22 +1,25 @@
 package com.maxclique.tuesday.app;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
+import java.io.File;
 import java.util.HashMap;
 
 /**
@@ -26,6 +29,7 @@ public class AddPostFragment extends Fragment {
 
     EditText subjectText;
     EditText detailsText;
+    ImageView mImageView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,6 +39,7 @@ public class AddPostFragment extends Fragment {
 
         subjectText = (EditText) resultantView.findViewById(R.id.subject);
         detailsText = (EditText) resultantView.findViewById(R.id.details);
+        mImageView = (ImageView) resultantView.findViewById(R.id.image);
 
         Button button = (Button) resultantView.findViewById(R.id.button_add);
         button.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +90,36 @@ public class AddPostFragment extends Fragment {
     }
 
     private void takePicture() {
-        
+        File file = new File(getActivity().getExternalFilesDir(null), "imageFile.jpg");
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null && file != null) {
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+            startActivityForResult(intent, 1435);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode != 1435 || resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        File file = new File(getActivity().getExternalFilesDir(null), "imageFile.jpg");
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
+        int requiredHeight = mImageView.getMaxHeight();
+        int requiredWidth = mImageView.getMeasuredWidth();
+        String imageType = options.outMimeType;
+        int inSampleSize = 1;
+        while ((imageHeight / inSampleSize) > requiredHeight ||
+                (imageWidth / inSampleSize) > requiredWidth) {
+            inSampleSize *= 2;
+        }
+        options.inSampleSize = inSampleSize;
+        options.inJustDecodeBounds = false;
+        mImageView.setImageBitmap(BitmapFactory.decodeFile(file.getAbsolutePath(), options));
     }
 
     @Override

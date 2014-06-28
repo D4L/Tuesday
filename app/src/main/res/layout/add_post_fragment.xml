@@ -26,11 +26,18 @@
         android:hint="@string/details_hint"
         android:inputType="text|textMultiLine"/>
 
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/details"
+        android:adjustViewBounds="true"/>
+
     <Button
         android:id="@+id/button_add_image"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/details"
+        android:layout_below="@id/image"
         android:layout_marginTop="20dp"
         android:background="@drawable/add_button_selector"
         android:text="@string/button_add_image_text"

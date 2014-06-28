@@ -14,6 +14,7 @@
     <string name="subject_hint">Subject</string>
     <string name="details_hint">Details</string>
     <string name="button_add_text">Add</string>
+    <string name="button_add_image_text">Take A Picture</string>
 
     <string name="add_post_title">Add to Weekend</string>
 

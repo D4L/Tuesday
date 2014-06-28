@@ -42,6 +42,13 @@ public class AddPostFragment extends Fragment {
                 addPost(subjectText.getText().toString(), detailsText.getText().toString());
             }
         });
+        button = (Button) resultantView.findViewById(R.id.button_add_image);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                takePicture();
+            }
+        });
         // set up the app icon as an UP button
         ActionBar actionBar = getActivity().getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -75,6 +82,10 @@ public class AddPostFragment extends Fragment {
             // display
             //writeListView(getString(R.string.no_network));
         }
+    }
+
+    private void takePicture() {
+        
     }
 
     @Override

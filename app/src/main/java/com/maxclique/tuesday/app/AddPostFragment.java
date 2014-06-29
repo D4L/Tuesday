@@ -12,7 +12,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,7 +21,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.HashMap;
 
@@ -58,7 +56,8 @@ public class AddPostFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                takePicture();
+                Intent intent = PictureHelper.getLargePicIntent(getActivity());
+                startActivityForResult(intent, PictureHelper.CAPTURE_IMAGE_REQUEST_CODE);
             }
         });
         // set up the app icon as an UP button
@@ -100,50 +99,21 @@ public class AddPostFragment extends Fragment {
     }
 
     private String encodePicture(Bitmap image) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        // TODO: think about this a bit more :P, compress rate small
-        image.compress(Bitmap.CompressFormat.JPEG, 50, baos);
-        StringBuilder sb = new StringBuilder();
-        sb.append("data:");
-        sb.append(mImageType);
-        sb.append(";base64,");
-        sb.append(Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT));
-        return sb.toString();
-    }
-
-    private void takePicture() {
-        File file = new File(getActivity().getExternalFilesDir(null), "imageFile.jpg");
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (intent.resolveActivity(getActivity().getPackageManager()) != null && file != null) {
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
-            startActivityForResult(intent, 1435);
-        }
+        return PictureHelper.encodePicture(image, mImageType);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != 1435 || resultCode != Activity.RESULT_OK) {
+        if (requestCode != PictureHelper.CAPTURE_IMAGE_REQUEST_CODE ||
+                resultCode != Activity.RESULT_OK) {
             return;
         }
-        File file = new File(getActivity().getExternalFilesDir(null), "imageFile.jpg");
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        int imageHeight = options.outHeight;
-        int imageWidth = options.outWidth;
-        int requiredHeight = mImageView.getMaxHeight();
-        int requiredWidth = mImageView.getMeasuredWidth();
-        String imageType = options.outMimeType;
-        int inSampleSize = 1;
-        while ((imageHeight / inSampleSize) > requiredHeight ||
-                (imageWidth / inSampleSize) > requiredWidth) {
-            inSampleSize *= 2;
-        }
-        options.inSampleSize = inSampleSize;
-        options.inJustDecodeBounds = false;
-        mImageType = imageType;
-        mImageBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-        mImageView.setImageBitmap(BitmapFactory.decodeFile(file.getAbsolutePath(), options));
+        options.inSampleSize = PictureHelper.getSampleSizeOfFile(getActivity(), options,
+                mImageView.getMaxHeight(), mImageView.getMeasuredWidth());
+        mImageType = options.outMimeType;
+        mImageBitmap = PictureHelper.getBitmapOfFile(getActivity(), options);
+        mImageView.setImageBitmap(mImageBitmap);
     }
 
     @Override

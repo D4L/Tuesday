@@ -5,10 +5,12 @@ import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Picture;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -87,10 +89,13 @@ public class DisplayPostFragment extends Fragment {
                             String imageDataBytes =
                                     resultOfTask.substring(resultOfTask.indexOf(",") + 1);
 
+                            BitmapFactory.Options options = new BitmapFactory.Options();
                             byte[] is = Base64.decode(imageDataBytes, Base64.NO_PADDING);
-                            Bitmap imageBitmap = BitmapFactory.decodeByteArray(
-                                    is, 0, is.length);
-                            mImageView.setImageBitmap(imageBitmap);
+                            options.inSampleSize = PictureHelper.getSampleSizeOfByteArray(is,
+                                    options, mImageView.getMaxHeight(),
+                                    mImageView.getMeasuredWidth());
+                            mImageView.setImageBitmap(
+                                    PictureHelper.getBitmapOfByteArray(is, options));
                         }
                     }
             ).execute();

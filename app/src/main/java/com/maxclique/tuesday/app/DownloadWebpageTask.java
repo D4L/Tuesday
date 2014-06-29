@@ -38,6 +38,7 @@ public class DownloadWebpageTask extends AsyncTask<Void, Void, String> {
     private String downloadUrl() throws IOException, UnfoundResourceException {
         InputStream is = null;
         HttpURLConnection conn = null;
+        BufferedReader reader = null;
         try {
             URL url = new URL(this.url);
             conn = (HttpURLConnection) url.openConnection();
@@ -57,20 +58,23 @@ public class DownloadWebpageTask extends AsyncTask<Void, Void, String> {
             is = conn.getInputStream();
 
             // Convert the InputStream into a string
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            String result = "";
-            String line = "";
+            reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder result = new StringBuilder();
+            String line;
             while ((line = reader.readLine()) != null) {
-                result += line;
+                result.append(line);
             }
 
-            return result;
+            return result.toString();
         } finally {
             if (conn != null) {
                 conn.disconnect();
             }
             if (is != null) {
                 is.close();
+            }
+            if (reader != null) {
+                reader.close();
             }
         }
     }

@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Base64;
-import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -66,8 +65,8 @@ public class PictureHelper {
         return getSampleSize(options, scaledHeight, scaledWidth);
     }
 
-    static public int getSampleSizeOfByteArray(byte [] image, BitmapFactory.Options options,
-                                               int scaledHeight,  int scaledWidth) {
+    static public int getSampleSizeOfByteArray(byte[] image, BitmapFactory.Options options,
+                                               int scaledHeight, int scaledWidth) {
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(image, 0, image.length, options);
         options.inJustDecodeBounds = false;
@@ -78,7 +77,7 @@ public class PictureHelper {
         return BitmapFactory.decodeFile(getImageFile(activity).getAbsolutePath(), options);
     }
 
-    static public Bitmap getBitmapOfByteArray(byte [] image, BitmapFactory.Options options) {
+    static public Bitmap getBitmapOfByteArray(byte[] image, BitmapFactory.Options options) {
         return BitmapFactory.decodeByteArray(image, 0, image.length, options);
     }
 }

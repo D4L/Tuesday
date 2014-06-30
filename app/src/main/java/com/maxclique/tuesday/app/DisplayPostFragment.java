@@ -3,22 +3,17 @@ package com.maxclique.tuesday.app;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Picture;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import org.json.JSONObject;
 
 /**
  * Created by Austin on 6/17/2014.
@@ -45,32 +40,20 @@ public class DisplayPostFragment extends Fragment {
         actionBar.setDisplayHomeAsUpEnabled(true);
         setHasOptionsMenu(true);
 
-        JSONObject object = grabObjectFromArgs();
+        Post object = grabPostFromArgs();
         if (object != null) {
             writeViews(object);
         }
 
         try {
-            grabImage(object.getString("_id"));
+            grabImage(object.getId());
         } catch (Exception e) {
         }
         return resultantView;
     }
 
-    private JSONObject grabObjectFromArgs() {
-        String stringObject = getArguments().getString("object", null);
-        if (stringObject == null) {
-            return null;
-        }
-        JSONObject object;
-        try {
-            object = new JSONParser<JSONObject>(stringObject,
-                    new JSONParser.JSONObjectFactory()).getJSON();
-        } catch (Exception e) {
-            titleView.setText("Failure!");
-            return null;
-        }
-        return object;
+    private Post grabPostFromArgs() {
+        return getArguments().getParcelable("post");
     }
 
     public void grabImage(String id) {
@@ -102,13 +85,12 @@ public class DisplayPostFragment extends Fragment {
         }
     }
 
-    private void writeViews(JSONObject object) {
+    private void writeViews(Post post) {
         try {
-            titleView.setText(object.getString(getString(R.string.subject)));
+            titleView.setText(post.getSubject());
             dateView.setText(TimeAgoParser.timeAgoSince(getActivity(),
-                    object.getLong(getString(R.string.created_at))));
-            detailsView.setText(object.optString(getString(R.string.details),
-                    ""));
+                    post.getCreatedAt()));
+            detailsView.setText(post.getDetails());
         } catch (Exception e) {
             titleView.setText("Failure!");
         }

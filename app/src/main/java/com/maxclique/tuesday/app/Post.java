@@ -17,9 +17,13 @@ public class Post implements Parcelable {
 
     final String CREATED_AT_FIELD = "created_at";
     final String SUBJECT_FIELD = "subject";
+    final String ID_FIELD = "_id";
+    final String DETAILS_FIELD = "details";
 
     long mCreatedAt;
     String mSubject;
+    String mId;
+    String mDetails;
 
     static public Post[] extractFromJson(String jsonString) throws JSONException {
         JSONArray extractJson = new JSONParser<JSONArray>(jsonString,
@@ -41,11 +45,15 @@ public class Post implements Parcelable {
     public Post(JSONObject object) throws JSONException {
         mCreatedAt = object.getLong(CREATED_AT_FIELD);
         mSubject = object.getString(SUBJECT_FIELD);
+        mDetails = object.optString(DETAILS_FIELD, "");
+        mId = object.getString(ID_FIELD);
     }
 
     public Post(Parcel source) {
         mSubject = source.readString();
         mCreatedAt = source.readLong();
+        mId = source.readString();
+        mDetails = source.readString();
     }
 
     public long getCreatedAt() {
@@ -54,6 +62,14 @@ public class Post implements Parcelable {
 
     public String getSubject() {
         return mSubject;
+    }
+
+    public String getId() {
+        return mId;
+    }
+
+    public String getDetails() {
+        return mDetails;
     }
 
     public static class CreatedAtComparator implements Comparator<Post> {
@@ -72,6 +88,8 @@ public class Post implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mSubject);
         dest.writeLong(mCreatedAt);
+        dest.writeString(mId);
+        dest.writeString(mDetails);
     }
 
     public static final Creator CREATOR = new Creator() {

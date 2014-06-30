@@ -20,10 +20,10 @@ public class Post implements Parcelable {
     final String ID_FIELD = "_id";
     final String DETAILS_FIELD = "details";
 
-    long mCreatedAt;
-    String mSubject;
-    String mId;
-    String mDetails;
+    private long mCreatedAt;
+    private String mSubject;
+    private String mId;
+    private String mDetails;
 
     static public Post[] extractFromJson(String jsonString) throws JSONException {
         JSONArray extractJson = new JSONParser<JSONArray>(jsonString,

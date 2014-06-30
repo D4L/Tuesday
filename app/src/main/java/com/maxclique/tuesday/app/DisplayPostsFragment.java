@@ -8,6 +8,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 public class DisplayPostsFragment extends Fragment {
 
     private ListView mListView;
+    private SwipeRefreshLayout mSwipeLayout;
     private Post[] mPosts = null;
 
     @Override
@@ -52,6 +54,18 @@ public class DisplayPostsFragment extends Fragment {
             }
         });
 
+        mSwipeLayout = (SwipeRefreshLayout) resultantView.findViewById(R.id.swipe_container);
+        mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
+        mSwipeLayout.setColorScheme(android.R.color.holo_blue_bright,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light,
+                android.R.color.holo_purple);
+
         if (mPosts == null) {
             refresh();
         } else {
@@ -75,6 +89,7 @@ public class DisplayPostsFragment extends Fragment {
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         writeListView(getString(R.string.fetching));
+        mSwipeLayout.setRefreshing(true);
         if (networkInfo != null && networkInfo.isConnected()) {
             new DownloadWebpageTask(ServerURL.getAllPosts(),
                     new DownloadWebpageTask.DownloadWebpageTaskCallback() {
@@ -86,6 +101,7 @@ public class DisplayPostsFragment extends Fragment {
                             } catch (Exception e) {
                                 writeListView("Failure!");
                             }
+                            mSwipeLayout.setRefreshing(false);
                         }
                     }
             ).execute();

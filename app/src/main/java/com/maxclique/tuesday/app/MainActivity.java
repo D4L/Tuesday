@@ -2,6 +2,7 @@ package com.maxclique.tuesday.app;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 
@@ -15,5 +16,10 @@ public class MainActivity extends Activity {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         DisplayPostsFragment fragment = new DisplayPostsFragment();
         fragmentTransaction.add(R.id.main_content, fragment).commit();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 }

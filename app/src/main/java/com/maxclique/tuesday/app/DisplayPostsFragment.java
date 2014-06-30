@@ -32,7 +32,7 @@ import java.util.Comparator;
 public class DisplayPostsFragment extends Fragment {
 
     private ListView mListView;
-    private JSONObject[] mObjects = null;
+    private Post[] mPosts = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,30 +46,32 @@ public class DisplayPostsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
                 PostListAdapter postListAdapter = (PostListAdapter) arg0.getAdapter();
-                JSONObject currentObject = postListAdapter.getObject(position);
+                Post currentPost = postListAdapter.getPost(position);
 
                 // switch the fragment
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 DisplayPostFragment fragment = new DisplayPostFragment();
                 Bundle args = new Bundle();
-                args.putString("object", currentObject.toString());
+                args.putParcelable("post", currentPost);
                 fragment.setArguments(args);
                 fragmentTransaction.replace(R.id.main_content, fragment)
                         .addToBackStack(null).commit();
             }
         });
 
-        if (mObjects == null) {
+        if (mPosts == null) {
             refresh();
         } else {
-            writeListView(mObjects);
+            writeListView(mPosts);
         }
 
         // set up the app icon as an UP button
         ActionBar actionBar = getActivity().getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setHomeButtonEnabled(false);
-        actionBar.setTitle(getString(R.string.app_name));
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(false);
+            actionBar.setHomeButtonEnabled(false);
+            actionBar.setTitle(getString(R.string.app_name));
+        }
         setHasOptionsMenu(true);
 
         return resultantView;
@@ -86,25 +88,8 @@ public class DisplayPostsFragment extends Fragment {
                         @Override
                         public void run(String resultOfTask) {
                             try {
-                                mObjects = JSONParser.convertJSONObjects(
-                                        new JSONParser<JSONArray>(resultOfTask,
-                                                new JSONParser.JSONArrayFactory()).getJSON()
-                                );
-                                Arrays.sort(mObjects, new Comparator<JSONObject>() {
-                                    @Override
-                                    public int compare(JSONObject lhs, JSONObject rhs) {
-                                        String field = getString(R.string.created_at);
-                                        long left, right;
-                                        try {
-                                            left = lhs.getLong(field);
-                                            right = rhs.getLong(field);
-                                        } catch (JSONException e) {
-                                            return 0;
-                                        }
-                                        return left < right ? 1 : -1;
-                                    }
-                                });
-                                writeListView(mObjects);
+                                mPosts = Post.extractFromJson(resultOfTask);
+                                writeListView(mPosts);
                             } catch (Exception e) {
                                 writeListView("Failure!");
                             }
@@ -118,29 +103,30 @@ public class DisplayPostsFragment extends Fragment {
     }
 
     protected void writeListView(String string) {
-        writeListView(JSONParser.convertJSONObjects(getString(R.string.subject), string));
+        // TODO: handle errors better
+        // writeListView(JSONParser.convertJSONObjects(getString(R.string.subject), string));
     }
 
-    protected void writeListView(JSONObject[] objects) {
+    protected void writeListView(Post[] posts) {
         PostListAdapter postAdapter = new PostListAdapter(getActivity(),
-                R.layout.display_post_row, objects);
+                R.layout.display_post_row, posts);
         mListView.setAdapter(postAdapter);
     }
 
-    private class PostListAdapter extends ArrayAdapter<JSONObject> {
+    private class PostListAdapter extends ArrayAdapter<Post> {
         Context context;
         int layoutResourceId;
-        JSONObject[] objects;
+        Post[] mPosts;
 
-        public PostListAdapter(Context context, int resource, JSONObject[] objects) {
+        public PostListAdapter(Context context, int resource, Post[] objects) {
             super(context, resource, objects);
             this.context = context;
             this.layoutResourceId = resource;
-            this.objects = objects;
+            this.mPosts = objects;
         }
 
-        public JSONObject getObject(int index) {
-            return objects[index];
+        public Post getPost(int index) {
+            return mPosts[index];
         }
 
         @Override
@@ -151,18 +137,15 @@ public class DisplayPostsFragment extends Fragment {
                         layoutResourceId, parent, false);
 
             }
-            JSONObject post = getObject(position);
+            Post post = getPost(position);
             TextView titleView = (TextView) row.findViewById(R.id.title);
             TextView dateView = (TextView) row.findViewById(R.id.date);
-            try {
-                titleView.setText(post.getString(getString(R.string.subject)));
-            } catch (JSONException e) {
-                titleView.setText(getString(R.string.json_convert_error));
+            if (titleView != null) {
+                titleView.setText(post.getSubject());
             }
-            try {
+            if (dateView != null) {
                 dateView.setText(TimeAgoParser.timeAgoSince(getContext(),
-                        post.getLong(getString(R.string.created_at))));
-            } catch (JSONException e) {
+                        post.getCreatedAt()));
             }
             return row;
         }
